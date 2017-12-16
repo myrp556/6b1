@@ -1,0 +1,48 @@
+{
+  "name": "xxx",
+  "version": "0.1",
+  "manifest_version": 2,
+  "description": "...",
+  "icons": {
+    "128": "user.png"
+  },
+  "background": {
+	"page":"background.html"
+  },
+  "browser_action": {
+    "default_icon": {
+      "32": "user.png"
+    },
+    "default_title": "boost8-master",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://gbf.game.mbga.jp/*",
+		    "http://game.granbluefantasy.jp/*"
+      ],
+      "js": [
+        "js/jquery/dist/jquery.js",
+        "js/comm.js",
+        "js/main.js"
+	    ],
+      "run_at": "document_end",
+      "all_frames": false
+    }
+  ],
+  "permissions": [
+		"notifications",
+		"browsingData",
+		"tabs",
+		"storage",
+		"webRequest",
+		"webRequestBlocking",
+		"tabs",
+		"http://*/*",
+		"https://*/*"
+  ],
+  "web_accessible_resources": [
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}
