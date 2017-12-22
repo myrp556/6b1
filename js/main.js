@@ -35,12 +35,12 @@ function sleep(delay) {
   }
 }
 
-setInterval(function() {
+window.auto_quest = setInterval(function() {
     window.Comm.getLocalValue(function(items) {
         var in_quest = items["in-quest"];
         var run_quest = items["run-quest"];
         var quest = items["quest"];
-
+        var battle_end = items["battle-end"];
 
         console.log("in-quest: "+in_quest+" run_quest: "+run_quest);
 
@@ -54,6 +54,7 @@ setInterval(function() {
                 console.log("quest 1");
                 window.Comm.setLocalValue("in-quest", 2, null);
                 window.Comm.setLocalValue("run-quest", 1, null);
+                window.Comm.setLocalValue('battle-end', 0, null);
                 location.href = "http://game.granbluefantasy.jp/#" + quest;
                 return;
             }
@@ -62,14 +63,11 @@ setInterval(function() {
                   return;
                 }
                 console.log("quest 2");
-                window.Comm.setLocalValue("run-quest", 2, null);
 
                 var summons = $(".btn-supporter.lis-supporter");
-                console.log("summon: " + $(".btn-supporter.lis-supporter").length);
-                console.log("check: " + $(".pop-deck.supporter") + " " + $(".pop-deck.supporter").css("display"));
                 //var selected_support =
-
-                if ($(".pop-deck.supporter").css("display") == 'none') {
+                console.log($(".pop-deck.supporter").css("display"));
+                if (!$(".pop-deck.supporter").css("display") || $(".pop-deck.supporter").html().length < 10 || $(".pop-deck.supporter").css("display") == 'none') {
                   console.log("select summon");
                   var summon;
                   var i;
@@ -81,14 +79,17 @@ setInterval(function() {
                     var name = res[0];
                     var lv = res[1];
                     if (name == "バハムート" || name == "カグヤ" || name == "ホワイトラビット") {
+                      console.log("tap summon");
                       tap($(summon));
                       //window.Comm.waitUntil($(".pop-deck.supporter"), 2000);
-                      break;
+                      return;
                     };
                   }
+                  return;
                 }
                 var cou = 0;
 
+                window.Comm.setLocalValue("run-quest", 2, null);
                 var wait_press_quest_start = function() {
                   new Promise(function(resolve) {
                     console.log("in promise");
@@ -96,18 +97,22 @@ setInterval(function() {
                   }).then(sleep(1000)).then(function() {
                     console.log("wait tapping deck-ok for quest start");
                     cou += 1;
-                    if ($(".pop-deck.supporter").css("display") == 'none') {
+                    if (!$(".pop-deck.supporter").css("display") || $(".pop-deck.supporter").css("display") == 'none') {
                       console.log("not found deck");
-                      if (cou < 5) wait_press_quest_start();
+                      if (cou < 10) wait_press_quest_start();
                       else {
                         alter("quest cant not start for not found deck!");
                         window.Comm.stopQuest();
                       }
                     } else {
+                      cou -= 1;
                       console.log('do next!');
                       //window.Comm.waitUntil($(".btn-usual-ok.se-quest-start"), 2000);
-                      window.Comm.setLocalValue("in-quest", 3);
-                      tap($(".btn-usual-ok.se-quest-start"));
+                      if (tap($(".btn-usual-ok.se-quest-start"))) {
+                        window.Comm.setLocalValue("in-quest", 3);
+                      } else {
+                        wait_press_quest_start();
+                      }
                     }
                   });
                 }
@@ -116,8 +121,10 @@ setInterval(function() {
                 return;
             }
 
-            console.log("....");
             if (in_quest == 3 && run_quest <= 3) {
+              var url = location.href
+              var prefix = window.Comm.getUrlPrefix();
+
               console.log("in quest 3");
               window.Comm.setLocalValue("run-quest", 3, null);
               console.log("wait for battle start...");
@@ -135,61 +142,115 @@ setInterval(function() {
               return;
             }
 
-            if (window.location.href.includes("result")) {
-              var expRes = $('.pop-usual.pop-exp.pop-show');
-              if (expRes.length > 0) {
-                console.log("click res ok");
-                tap(expRes.find('.btn-usual-ok'));
-                return;
-              }
-              var friendRequest = $('.pop-usual.friend-request.pop-show');
-              if (friendRequest.length > 0) {
-                console.log("cancle friend request");
-                tap(friendRequest.find(".btn-usual-cancle"));
-                return;
-              }
-              var newItem = $('.pop-usual.pop-newitem.pop-show');
-              if (newItem.length > 0) {
-                console.log("new item!");
-                tap(newItem.find(".btn-usual-ok"));
-                return;
-              }
-              var cntRes = $('.cnt-result');
-              if (cntRes.length > 0) {
-                console.log("return quests");
-                tap(cntRes.find('.btn-control.longname'));
-                return;
-              }
-              var hellAppearance = $('.pop-usual.pop-hell-appearance')
-              if (hellAppearance.length > 0) {
-                alter("hell appear!");
-                window.Comm.stopQuest();
-                return;
-              }
-              var notifiTitle = $('.pop-usual.pop-notification-title.pop-show');
-              if (notifiTitle.length > 0) {
-                console.log("click title");
-                tap(notifiTitle.find('.btn-usual-ok'));
-                return;
-              }
-
-              console.log("retrive");
-              window.Comm.setLocalValue("in-quest", 1, null);
-              window.Comm.setLocalValue("run-quest", 0, null);
-
-              return;
-            }
-
             if (in_quest == 4 && run_quest == 3) {
-              console.log("in battle!");
+              console.log(window.Comm.getUrlPrefix());
+              var prefix = window.Comm.getUrlPrefix()
+              if (prefix.includes("quest")) {
+                console.log("set battle end");
+                window.Comm.setLocalValue('battle-end', 1, null);
+                window.Comm.stopQuest();
+                window.Comm.startQuest(quest);
+                return;
+              }
+              if (window.Comm.getUrlPrefix() == '#result/') {
+                console.log("battle res");
+                if (battle_end == 1) {
+                  console.log('retrive');
+                  window.Comm.setLocalValue('in-quest', 1, null);
+                  window.Comm.setLocalValue('run-quest', 0, null);
+                  return
+                } else {
 
-              if (battle()) return;
-
+                  var expRes = $('.pop-usual.pop-exp.pop-show');
+                  if (expRes.length > 0) {
+                    console.log("click res ok");
+                    tap(expRes.find('.btn-usual-ok'));
+                    return;
+                  }
+                  var friendRequest = $('.pop-usual.friend-request.pop-show');
+                  if (friendRequest.length > 0) {
+                    console.log("cancle friend request");
+                    tap(friendRequest.find(".btn-usual-cancle"));
+                    return;
+                  }
+                  var newItem = $('.pop-usual.pop-newitem.pop-show');
+                  if (newItem.length > 0) {
+                    console.log("new item!");
+                    tap(newItem.find(".btn-usual-ok"));
+                    return;
+                  }
+                  var reward = $('.pop-usual.pop-reward-item.pop-show')
+                  if (reward.length > 0) {
+                    console.log("reward");
+                    tap(reward.find('.btn-usual-ok'));
+                    return;
+                  }
+                  var hellAppearance = $('.pop-usual.pop-hell-appearance')
+                  if (hellAppearance.length > 0) {
+                    window.Comm.stopQuest();
+                    location.href = "http://game.granbluefantasy.jp/#quest/supporter/510051/5";
+                    alert("hell appear!");
+                    return;
+                  }
+                  var notifiTitle = $('.pop-usual.pop-notification-title.pop-show');
+                  if (notifiTitle.length > 0) {
+                    console.log("click title");
+                    tap(notifiTitle.find('.btn-usual-ok'));
+                    return;
+                  }
+                  var cntRes = $('.cnt-result');
+                  if (cntRes.length > 0) {
+                    console.log("return quests");
+                    //window.Comm.setLocalValue('battle-end', 1, null);
+                    tap(cntRes.find('.btn-control'));
+                    return;
+                  }
+                }
+              } else {
+                console.log("in battle!");
+                battle();
+                return;
+              }
             }
-        }
+            return;
+          }
+      });
+  }, 1000);
 
-    });
+
+window.auto_cop = setInterval(function() {
+  window.Comm.getLocalValue(function(items){
+    //var in_cop = items['in-cop'];
+    var run_cop = items['run-cop'];
+    var prefix = window.Comm.getUrlPrefix();
+    var isOwner = 1
+
+    if (run_cop == 0) {
+      console.log('in room waitting to start');
+      if (prefix == '#coopraid/room') {
+        if (isOwner > 0) {
+          var btn_start = $('.btn-quest-start.multi');
+          if (btn.length > 0) {
+            console.log('tap quest start');
+            tap(btn);
+            return;
+          }
+        } else {
+
+        }
+      }
+      if (prefix = 'raid/') {
+        window.Comm.setLocalValue("run-cop", 1);
+        return;
+      }
+
+    }
+  });
 }, 1000);
+
+
+
+
 
 function battle() {
   if (window.Comm.attackBtnReady()) {
@@ -198,6 +259,37 @@ function battle() {
   }
   return false;
 }
+
+setInterval(function() {
+  var conts = location.href.split('/');
+  window.Comm.setLocalValue("current-url", conts.slice(3, conts.length).join("/"))
+}, 500);
+
+/*setInterval(function() {
+  var stage = window.stage;
+  console.log("state: "+stage);
+  if (stage) {
+    var gameStatus = stage.gGameStatus;
+    var boss = gameStatus.boss;
+    var turn = gameStatus.turn;
+    var enemy_num = boss.length;
+    var i;
+    for (i = 0; i < enemy_num; i++) {
+      if (enemy.alive != 1) continue;
+      var enemy = boss[i];
+      var mode = gameStatus.bossmode.looks.mode[i];
+      // mode == 1 normal
+      // mode == 2 od
+      // mode == 3 break
+      var gauge = gameStatus.bossmode.looks.gauge[i];
+      // od charge
+      var max_hp = enemy.hpmap;
+      var hp = enemy.hp;
+      var name = enemy.name;
+      console.log([name, hp, max_hp, mode, gauge]);
+    }
+  }
+}, 500);*/
 
 function attackStart() {
   tap($(".btn-attack-start"));
@@ -209,7 +301,9 @@ function tap(sle) {
         var evt = document.createEvent('MouseEvents');
         evt.initEvent('tap', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
         $(sle)[0].dispatchEvent(evt);
+        return true;
     } else {
+      return false;
     }
 }
 

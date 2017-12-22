@@ -6,6 +6,12 @@ var PopUp = {
         //window.localStorage.setItem("speed", 99);
         console.log($("#btn-speed"));
 
+        console.log("check ban");
+        var bg = chrome.extension.getBackgroundPage();
+        console.log("ban: " + bg.ban());
+        bg.ban();
+        bg.run();
+
         var t = this;
         $("#fly-speed").click(function() {
             console.log("click speed");
@@ -27,13 +33,27 @@ var PopUp = {
                     window.Comm.stopQuest();
                 } else {
                     console.log("start quest");
-                    var quest = "quest/supporter/11/0";
+                    //var quest = "quest/supporter/11/0";
+                    //quest = "quest/supporter/510031/5";
+                    var quest = items['quest'];
                     window.Comm.startQuest(quest);
                 }
                 t.refreshQuestButton();
             });
         });
         t.refreshQuestButton();
+
+        $("#copy-quest").click(function() {
+          window.Comm.getLocalValue(function(items) {
+            var url = items['current-url'];
+            window.Comm.setLocalValue('quest', url);
+            $("#quest-url").val(url);
+          });
+        });
+        window.Comm.getLocalValue(function(items) {
+          var quest = items['quest'];
+          $("#quest-url").val(quest);
+        });
     },
 
 

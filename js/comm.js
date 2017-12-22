@@ -26,21 +26,36 @@ window.Comm = {
     }
   },
 
+  'getUrlPrefix': function() {
+    var url = location.href;
+    var conts = url.split('/');
+    var prefix = conts[3];
+    var sub = '';
+    var re = /[\d]+/;
+    if (conts.length > 4 && !re.test(conts[4])) {
+      sub = conts[4];
+    }
+    return prefix+'/'+sub;
+  },
+
   'startQuest': function(quest) {
     console.log("start quest " + quest);
     this.setLocalValue('in-quest', 1);
     this.setLocalValue('run-quest', 0);
-    this.setLocalValue('quest', quest);
+    this.setLocalValue('battle-end', 0);
+    //this.setLocalValue('quest', quest);
+
   },
 
   'stopQuest': function() {
     console.log("stop quest");
     window.Comm.setLocalValue("in-quest", 0);
     window.Comm.setLocalValue("run-quest", 0);
+
   },
 
   'attackBtnReady': function() {
-    return $(".btn-attack-start").length > 0 && $(".btn-attack-start").css("display")!='none' && $('.btn-attack-start').hasClass("display-on");
+    return $(".btn-attack-start").length > 0 && $(".btn-attack-start").css("display") && $(".btn-attack-start").css("display")!='none' && $('.btn-attack-start').hasClass("display-on");
   },
 
   'getSummonInfo': function(sel) {
