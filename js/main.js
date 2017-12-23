@@ -41,8 +41,12 @@ window.auto_quest = setInterval(function() {
         var run_quest = items["run-quest"];
         var quest = items["quest"];
         var battle_end = items["battle-end"];
+        var prefix = window.Comm.getUrlPrefix();
+        var check_hell = items['check-hell'];
 
-        console.log("in-quest: "+in_quest+" run_quest: "+run_quest);
+        if (in_quest > 0) {
+          console.log("in-quest: "+in_quest+" run_quest: "+run_quest);
+        }
 
         if (in_quest > 0 && in_quest >= run_quest && quest!=null && quest.length > 0) {
 
@@ -109,7 +113,7 @@ window.auto_quest = setInterval(function() {
                       console.log('do next!');
                       //window.Comm.waitUntil($(".btn-usual-ok.se-quest-start"), 2000);
                       if (tap($(".btn-usual-ok.se-quest-start"))) {
-                        window.Comm.setLocalValue("in-quest", 3);
+                        window.Comm.setLocalValue("in-quest", 3, null);
                       } else {
                         wait_press_quest_start();
                       }
@@ -123,7 +127,6 @@ window.auto_quest = setInterval(function() {
 
             if (in_quest == 3 && run_quest <= 3) {
               var url = location.href
-              var prefix = window.Comm.getUrlPrefix();
 
               console.log("in quest 3");
               window.Comm.setLocalValue("run-quest", 3, null);
@@ -144,7 +147,6 @@ window.auto_quest = setInterval(function() {
 
             if (in_quest == 4 && run_quest == 3) {
               console.log(window.Comm.getUrlPrefix());
-              var prefix = window.Comm.getUrlPrefix()
               if (prefix.includes("quest")) {
                 console.log("set battle end");
                 window.Comm.setLocalValue('battle-end', 1, null);
@@ -154,6 +156,13 @@ window.auto_quest = setInterval(function() {
               }
               if (window.Comm.getUrlPrefix() == '#result/') {
                 console.log("battle res");
+                if (!check_hell) {
+                  window.Comm.setLocalValue('battle-end', 1, null);
+                  window.Comm.stopQuest();
+                  window.Comm.startQuest(quest);
+                  return;
+                }
+
                 if (battle_end == 1) {
                   console.log('retrive');
                   window.Comm.setLocalValue('in-quest', 1, null);
@@ -167,10 +176,10 @@ window.auto_quest = setInterval(function() {
                     tap(expRes.find('.btn-usual-ok'));
                     return;
                   }
-                  var friendRequest = $('.pop-usual.friend-request.pop-show');
+                  var friendRequest = $('.pop-usual.pop-friend-request.pop-show');
                   if (friendRequest.length > 0) {
-                    console.log("cancle friend request");
-                    tap(friendRequest.find(".btn-usual-cancle"));
+                    console.log("cancel friend request");
+                    tap(friendRequest.find(".btn-usual-cancel"));
                     return;
                   }
                   var newItem = $('.pop-usual.pop-newitem.pop-show');
@@ -208,7 +217,7 @@ window.auto_quest = setInterval(function() {
                 }
               } else {
                 console.log("in battle!");
-                battle();
+                battle(prefix);
                 return;
               }
             }
@@ -220,30 +229,116 @@ window.auto_quest = setInterval(function() {
 
 window.auto_cop = setInterval(function() {
   window.Comm.getLocalValue(function(items){
-    //var in_cop = items['in-cop'];
+    var in_cop = items['in-cop'];
     var run_cop = items['run-cop'];
     var prefix = window.Comm.getUrlPrefix();
-    var isOwner = 1
+    // 0 single, 1 owner, 2 member
+    var cop_option = items['cop-option'];
 
-    if (run_cop == 0) {
+    if (in_cop > 0) {
+      console.log(cop_option + " in-cop: "+in_cop+" run-cop: "+run_cop);
+    }
+
+    if (in_cop == 1 && run_cop == 0) {
       console.log('in room waitting to start');
-      if (prefix == '#coopraid/room') {
-        if (isOwner > 0) {
-          var btn_start = $('.btn-quest-start.multi');
-          if (btn.length > 0) {
-            console.log('tap quest start');
-            tap(btn);
-            return;
-          }
-        } else {
-
-        }
-      }
-      if (prefix = 'raid/') {
-        window.Comm.setLocalValue("run-cop", 1);
+      if (prefix.includes('raid_multi')) {
+        console.log("into raid multi");
+        window.Comm.setLocalValue('in-cop', 2, null);
+        window.Comm.setLocalValue('run-cop', 1, null);
         return;
       }
+      if (prefix == '#coopraid/room') {
+        if (cop_option < 2) {
+          var btn_start = $('.btn-quest-start.multi');
+          if (btn_start.length > 0 && !btn_start.hasClass('disable')) {
+            console.log('tap cop start');
+            window.Comm.setLocalValue('run-cop', 1, null);
+            tap(btn_start);
+            return;
+          }else {
+              console.log("owner waitting");
+          }
+        } else {
+            var btn_retract = $('.btn-retraction-ready');
+            if (btn_retract.length > 0) {
+              window.Comm.setLocalValue('run-cop', 1, null);
+              return;
+            }
+            var btn_ready = $('.btn-execute-ready.se-ok');
+            if (btn_ready.length > 0 && !btn_ready.hasClass('disable')) {
+              console.log('tap cop ready');
+              window.Comm.setLocalValue('run-cop', 1, null);
+              tap(btn_ready);
+              return;
+            } else {
+               console.log("member waitting");
+            }
+        }
+      }
+    }
+    if (in_cop == 1 && run_cop == 1) {
+      if (prefix == '#raid_multi/') {
+        window.Comm.setLocalValue("in-cop", 2, null);
+        return;
+      }
+      var stamina = $('.pop-usual.pop-stamina.pop-show')
+      if (stamina.length > 0) {
+        alert("no ap enough!");
+        window.Comm.stopCop();
+        return;
+      }
+    }
 
+    if (in_cop == 2 && run_cop == 1) {
+      if (prefix.includes('raid_multi')) {
+        console.log("in battle");
+        if (cop_option == 0 || cop_option == 2) {
+          battle(prefix);
+        }
+      } else {
+        console.log("enter multi raid res");
+        window.Comm.setLocalValue("in-cop", 3, null);
+      }
+      return;
+    }
+
+    if (in_cop == 3) {
+      if (prefix == '#coopraid/room') {
+        console.log("back to start");
+        window.Comm.setLocalValue("in-cop", 1, null);
+        window.Comm.setLocalValue('run-cop', 0, null);
+        return;
+      }
+      if (prefix.includes("result_multi")) {
+        console.log("multi res");
+        var exp = $(".pop-usual.pop-exp.pop-show");
+        if (exp.length > 0) {
+            console.log("tap exp");
+            tap(exp.find(".btn-usual-ok"));
+            return;
+        }
+
+        var mission = $(".pop-usual.pop-mission-check.pop-show");
+        if (mission.length > 0) {
+          console.log("top mission");
+          tap(mission.find(".btn-usual-close"));
+          return;
+        }
+
+        var friendRequest = $('.pop-usual.pop-friend-request.pop-show');
+        if (friendRequest.length > 0) {
+          console.log("cancle friendRequest");
+          var btn = friendRequest.find(".btn-usual-cancel");
+          tap(btn);
+          return;
+        }
+
+        if ($(".btn-control").length > 0) {
+          console.log("back to room");
+          tap($(".btn-control"));
+          return;
+        }
+      }
     }
   });
 }, 1000);
@@ -252,18 +347,43 @@ window.auto_cop = setInterval(function() {
 
 
 
-function battle() {
-  if (window.Comm.attackBtnReady()) {
-    attackStart();
-    return true;
-  }
-  return false;
+function battle(prefix) {
+  window.Comm.getLocalValue(function(items){
+    if (window.Comm.attackBtnReady()) {
+      if (prefix.includes('raid_multi')) {
+        var cop_option = items['cop-option'];
+        if (cop_option == 1) {
+          attackStart();
+          return true;
+        } else {
+          var btn = window.Comm.getCharaAblilityBtn(1, 1);
+          if (btn) {
+            console.log("click ability");
+            tap(btn);
+            return true;
+          } else {
+            console.log("ability not ready");
+          }
+          return false;
+        }
+      } else {
+        console.log("click attack");
+        attackStart();
+      }
+      return true;
+    } else {
+      console.log("battle waitting");
+    }
+    return false;
+  });
 }
 
 setInterval(function() {
   var conts = location.href.split('/');
-  window.Comm.setLocalValue("current-url", conts.slice(3, conts.length).join("/"))
+  window.Comm.setLocalValue("current-url", conts.slice(3, conts.length).join("/"), null)
 }, 500);
+
+
 
 /*setInterval(function() {
   var stage = window.stage;
@@ -328,3 +448,28 @@ var setValue = function(key, value) {
 
 }
 */
+
+$(document).keypress(function(e) {
+    window.Comm.getLocalValue(function(items) {
+      var last_key = items['last-key'];
+      var key = e.which;
+
+      window.Comm.setLocalValue('last-key', key, null);
+      if (key == 116) {
+        attackStart();
+      }
+      if (key == 115 && last_key == 115) {
+        location.reload();
+      }
+    });
+});
+
+$('.btn-attack-start').bind('tap', function() {
+  console.log('btn-attck');
+  window.Comm.getLocalValue(function(items) {
+    var stuck_refresh = items['stuck-refresh'];
+    if (stuck_refresh && this.hasClass('display-on')) {
+      location.reload();
+    }
+  });
+});

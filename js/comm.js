@@ -40,18 +40,40 @@ window.Comm = {
 
   'startQuest': function(quest) {
     console.log("start quest " + quest);
-    this.setLocalValue('in-quest', 1);
-    this.setLocalValue('run-quest', 0);
-    this.setLocalValue('battle-end', 0);
+    this.setLocalValue('in-quest', 1, null);
+    this.setLocalValue('run-quest', 0, null);
+    this.setLocalValue('battle-end', 0, null);
     //this.setLocalValue('quest', quest);
 
   },
 
+  'getCharaAblilityBtn': function(chara, num) {
+    var btn = $(".ability-character-num-"+chara+"-"+num);
+    if (btn.length > 0) {
+      var par = btn.parent();
+      if (par.hasClass('btn-ability-unavailable')) return null;
+      return par;
+    }
+    return null;
+  },
+
   'stopQuest': function() {
     console.log("stop quest");
-    window.Comm.setLocalValue("in-quest", 0);
-    window.Comm.setLocalValue("run-quest", 0);
+    window.Comm.setLocalValue("in-quest", 0, null);
+    window.Comm.setLocalValue("run-quest", 0, null);
 
+  },
+
+  'startCop': function() {
+    console.log("start cop");
+    this.setLocalValue('in-cop', 1, null);
+    this.setLocalValue('run-cop', 0, null);
+  },
+
+  'stopCop': function() {
+    console.log("stop cop");
+    this.setLocalValue("in-cop", 0, null);
+    this.setLocalValue("run-cop", 0, null);
   },
 
   'attackBtnReady': function() {

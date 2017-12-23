@@ -9,14 +9,38 @@
   <script src="js/background_.js"></script>
   <script src="js/popup.js"></script>
 </head>
-<body>
+<body style="width: 500px; height: 800px">
   <h1>sodayo</h1>
+  <div>
+    <input type="checkbox" id="quick-attack"/>
+    <label>quick attack</label>
+    <input type="checkbox" id="stuck-refresh" />
+    <label>stuck refresh</label>
+  </div>
+
   <input id="fly-speed" type="button" class="btn btn-primary" value="speed" />
+  <br />
 
   <input id="copy-quest" tupe="button" class="btn btn-primary" value="copy quest" />
-  <input id="quest-url" style="pointer-events: none;" />
+  <br />
+  <div>
+    <input id="quest-url" style="pointer-events: none;" />
+    <input type="checkbox" id="check-hell" />
+    <label>check hell</label>
+  </div>
+  <br />
 
   <input id="quest-button" type="button" class="btn btn-primary" value="quest" />
+  <br />
 
-</body>
+  <input id="cop-button" type="button" class="btn btn-primary" value="cop" />
+  <div>
+    <label>single</label>
+    <input class="cop-option cop-option-0" name="cop-option" type="radio" value="0" />
+    <label>owner</label>
+    <input class="cop-option cop-option-1" name="cop-option" type="radio" value="1" />
+    <label>member</label>
+    <input class="cop-option cop-option-2" name="cop-option" type="radio" value="2" />
+  </div>
+  </body>
 </html>

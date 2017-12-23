@@ -12,6 +12,24 @@ var PopUp = {
         bg.ban();
         bg.run();
 
+        $('#quick-attack').change(function() {
+            var val = this.checked;
+            window.Comm.setLocalValue('quick-attack', val);
+        });
+        window.Comm.getLocalValue(function(items) {
+            var quick_attack = items['quick-attack'];
+            $('#quick-attack').prop('checked', quick_attack);
+        });
+
+        $('#stuck-refresh').change(function() {
+          var val = this.checked;
+          window.Comm.setLocalValue('stuck-refresh', val);
+        });
+        window.Comm.getLocalValue(function(items) {
+          var stuck_refresh = items['stuck-refresh'];
+          $('#stuck-refresh').prop('checked', stuck_refresh);
+        });
+
         var t = this;
         $("#fly-speed").click(function() {
             console.log("click speed");
@@ -43,6 +61,35 @@ var PopUp = {
         });
         t.refreshQuestButton();
 
+        $("#cop-button").click(function() {
+          window.Comm.stopQuest();
+          window.Comm.getLocalValue(function(items) {
+              var in_cop = items['in-cop'];
+              if (in_cop > 0) {
+                window.Comm.stopCop();
+              } else {
+                window.Comm.startCop();
+              }
+              t.refreshCopButton();
+          });
+        });
+        t.refreshCopButton();
+
+        var cop_options = $('.cop-option')
+        console.log(cop_options);
+        cop_options.click(function() {
+          t.refreshCopOption(this.value);
+        });
+
+        window.Comm.getLocalValue(function(items) {
+            var cop_option = items['cop-option'];
+            if (cop_option && cop_option > 0) {
+              $('.cop-option-'+cop_option)[0].checked = true;
+            } else {
+                $('.cop-option-0')[0].checked = true;
+            }
+        });
+
         $("#copy-quest").click(function() {
           window.Comm.getLocalValue(function(items) {
             var url = items['current-url'];
@@ -50,9 +97,16 @@ var PopUp = {
             $("#quest-url").val(url);
           });
         });
+
         window.Comm.getLocalValue(function(items) {
           var quest = items['quest'];
+          var check_hell = items['check-hell'];
           $("#quest-url").val(quest);
+          $("#check-hell").prop('checked', check_hell);
+        });
+        $('#check-hell').change(function() {
+          console.log(this.checked);
+            window.Comm.setLocalValue("check-hell", this.checked, null);
         });
     },
 
@@ -73,6 +127,20 @@ var PopUp = {
                 $('#quest-button').val("start quest");
             }
         });
+    },
+    refreshCopButton: function() {
+      window.Comm.getLocalValue(function(items) {
+          var in_cop = items['in-cop'];
+          if (in_cop > 0) {
+            $("#cop-button").val("stop cop");
+          } else {
+            $("#cop-button").val("start cop");
+          }
+      });
+    },
+    refreshCopOption: function(v) {
+        console.log("set cop-option: "+v);
+        window.Comm.setLocalValue('cop-option', parseInt(v), null);
     }
 }
 
