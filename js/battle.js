@@ -2,7 +2,8 @@
 
 window.Battle = {
   'prefrences': {
-    'simple': {},
+    'attack': {},
+    '1.1': {'normal': ['1.1']},
     '光': {
       'normal': ['1.1', '1.3', '2.1', '2.2', '2.3', '3.1', '4.2', '4.1', '4.3'],
       'linear': [
@@ -12,78 +13,117 @@ window.Battle = {
   },
 
   'tap_attack_start': function() {
-      this.tap($('.btn-attack-start'));
+      return window.Comm.tap($('.btn-attack-start'));
   },
 
-  'battle_step_forward': function(prefix) {
-    window.Comm.getLocalValue(function(items){
-      if (items['in-step-forward'] > 0) return;
-      window.Comm.setLocalValue('in-step-forward', 1, null);
-      var prefrence = items['battle-prefrence']
-      var prefrences = window.Battle.prefrences;
-      (function(){
-        if (window.Comm.attackBtnReady()) {
-          if (prefix.includes('raid_multi')) {
-            var cop_option = items['cop-option'];
-            if (cop_option == 1) {
-              attackStart();
-              return true;
-            } else {
-              var btn = window.Comm.getCharaAblilityBtn(1, 1);
-              if (btn) {
-                console.log("click ability");
-                tap(btn);
-                return true;
-              } else {
-                console.log("ability not ready");
-              }
-              return false;
-            }
-          } else {
-            if (prefrence && prefrence in prefrences) {
-              var plan = prefrences[prefrence];
-              var i, j;
-              if ('normal' in plan) {
-                for (i in plan['normal']) {
-                  var btn = window.Comm.getCharaAblilityBtn_dot(plan['normal'][i]);
-                  if (btn != null && btn) {
-                    if (!window.Comm.abilityRailIsClear()) {
-                      console.log("waiting skill");
-                      return;
-                    }
-                    if (window.Comm.tap(btn)) {
-                      console.log("tap normal " + plan['normal'][i]);
-                      return;
-                    }
-                  }
-                }
-              }
-              if ('linear' in plan) {
-                for (i in plan['linear']) {
-                  var linear = plan['linear'][i];
-                  if (window.Comm.abilityListReady_dot(linear)) {
-                    if (!window.Comm.abilityRailIsClear()) {
-                      console.log("waitting skill");
-                      return;
-                    }
-                    for (j in linear) {
-                      console.log("tap linear " + linear[j]);
-                      window.Comm.tap(window.Comm.getCharaAblilityBtn_dot(linear[j]));
-                    }
-                    return;
-                  }
-                }
-              }
-              window.Battle.tap_attack_start();
-            } else {
-              window.Battle.tap_attack_start();
+  'get_turn_number': function() {
+    var prt_number = $('.prt-number');
+    var turn_num = 0;
+    var i;
+    if (prt_number.length > 0) {
+      for (i in $('.prt-number').children()) {
+          if (i == $('.prt-number').children().length-1) break;
+          var blk = $($('.prt-number').children()[i]);
+          if (blk.css('display') != 'none') {
+            var cls = blk.attr('class');
+            var conts = cls.split('n');
+            if (conts.length > 1) {
+              turn_num = turn_num * 10 + parseInt(conts[2]);
             }
           }
+      }
+      return turn_num;
+    } else {
+      return 0;
+    }
+  },
+
+  'battle_step_forward': function() {
+    //console.log('battle step forward');
+    var btn_res = $('.btn-result.on');
+    if (btn_res.length > 0) {
+      console.log("battle res");
+      window.Comm.tap(btn_res);
+      return;
+    }
+
+    var turn_num = this.get_turn_number();
+    console.log("turn " + turn_num);
+    if (turn_num == 1) {
+      window.Comm.setLocalValue('action-list', [], null);
+    }
+
+    var rematch = $('.pop-usual.pop-rematch-fail.pop-show');
+    if (rematch.length > 0) {
+      console.log("rematch fail");
+      window.Comm.tap(rematch.find(".btn-usual-ok"));
+      return;
+    }
+
+    var trial = $('.pop-usual.pop-trialbattle-notice.pop-show');
+    if (trial.length > 0) {
+      console.log("trial");
+      window.Comm.tap(trial.find('.btn-usual-close'));
+      return;
+    }
+
+    window.Comm.getLocalValue(function(items){
+      //if (items['in-step-forward'] > 0) return;
+      window.Comm.setLocalValue('in-step-forward', 1, null);
+      var prefrence = items['battle-prefrence'];
+      var prefrences = window.Battle.prefrences;
+      var action_list = items['action-list'];
+      if (!action_list || typeof(action_list) == 'undefined') {
+        action_list = [];
+      }
+
+      //console.log("prefrence " + prefrence);
+      //console.log("action-list" + action_list);
+
+      (function() {
+        var i, j, k;
+        if ((!action_list || action_list.length == 0 ) && prefrence && prefrence in prefrences) {
+          var plan = prefrences[prefrence];
+          for (i in plan['normal']) {
+            var btn = window.Comm.getCharaAblilityBtn_dot(plan['normal'][i]);
+            if (btn != null && btn) {
+              console.log("add normal " + plan['normal'][i]);
+              action_list.push(plan['normal'][i]);
+            }
+          }
+          for (i in plan['linear']) {
+            var linear = plan['linear'][i];
+            if (window.Comm.abilityListReady_dot(linear)) {
+              for (j in linear) {
+                console.log("add linear " + linear[j]);
+                //window.Comm.tap(window.Comm.getCharaAblilityBtn_dot(linear[j]));
+                action_list.push(linear[j]);
+              }
+            }
+          }
+        }
+        if (window.Comm.attackBtnReady()) {
+          if (window.Comm.abilityRailIsClear()) {
+            if (action_list && action_list.length > 0) {
+              for (i in action_list) {
+                var btn = window.Comm.getCharaAblilityBtn_dot(action_list[i]);
+                action_list.splice(i, 1);
+                if (btn) {
+                  window.Comm.tap(btn);
+                  return;
+                }
+              }
+            }
+            window.Battle.tap_attack_start();
+          } else {
+            //console.log("in skill");
+          }
         } else {
-          console.log("battle waitting");
+          //console.log("attack btn not ready");
         }
       })();
       window.Comm.setLocalValue('in-step-forward', 0, null);
+      window.Comm.setLocalValue('action-list', action_list, null);
     });
   }
 }

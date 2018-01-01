@@ -99,8 +99,8 @@ window.Comm = {
   },
 
   'abilityRailIsClear': function() {
-    var rail = $('.prt-ability-rail-overlay');
-    if (rail.length > 0 && rails.hasClass('hide')) return true;
+    var rail = $('.prt-ability-rail-overlayer');
+    if (rail.length == 0 || rail.hasClass('hide')) return true;
     return false;
   },
 
@@ -155,5 +155,52 @@ window.Comm = {
       }
     }
     return summons[0];
+  },
+
+  'handle_battle_result': function() {
+    var expRes = $('.pop-usual.pop-exp.pop-show');
+    if (expRes.length > 0) {
+      console.log("click res ok");
+      tap(expRes.find('.btn-usual-ok'));
+      return true;
+    }
+    var friendRequest = $('.pop-usual.pop-friend-request.pop-show');
+    if (friendRequest.length > 0) {
+      console.log("cancel friend request");
+      tap(friendRequest.find(".btn-usual-cancel"));
+      return true;
+    }
+    var newItem = $('.pop-usual.pop-newitem.pop-show');
+    if (newItem.length > 0) {
+      console.log("new item!");
+      tap(newItem.find(".btn-usual-ok"));
+      return true;
+    }
+    var reward = $('.pop-usual.pop-reward-item.pop-show')
+    if (reward.length > 0) {
+      console.log("reward");
+      tap(reward.find('.btn-usual-ok'));
+      return true;
+    }
+    var abilityItem = $('.pop-usual.pop-get-abilityitem.pop-show');
+    if (abilityItem.length > 0) {
+      console.log("ability item");
+      tap(abilityItem.find('.btn-usual-ok'));
+      return true;
+    }
+    var notifiTitle = $('.pop-usual.pop-notification-title.pop-show');
+    if (notifiTitle.length > 0) {
+      console.log("click title");
+      tap(notifiTitle.find('.btn-usual-ok'));
+      return true;
+    }
+
+    var mission = $(".pop-usual.pop-mission-check.pop-show");
+    if (mission.length > 0) {
+      console.log("top mission");
+      tap(mission.find(".btn-usual-close"));
+      return true;
+    }
+    return false;
   }
 }

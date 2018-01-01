@@ -93,7 +93,7 @@ var PopUp = {
         $("#copy-quest").click(function() {
           window.Comm.getLocalValue(function(items) {
             var url = items['current-url'];
-            window.Comm.setLocalValue('quest', url);
+            window.Comm.setLocalValue('quest', url, null);
             $("#quest-url").val(url);
           });
         });

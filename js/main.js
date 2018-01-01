@@ -166,74 +166,33 @@ window.auto_quest = setInterval(function() {
                   return;
                 }
 
-                if (battle_end == 1) {
-                  console.log('retrive');
-                  window.Comm.setLocalValue('in-quest', 1, null);
-                  window.Comm.setLocalValue('run-quest', 0, null);
-                  return
-                } else {
+                if (window.Comm.handle_battle_result()) return;
 
-                  var expRes = $('.pop-usual.pop-exp.pop-show');
-                  if (expRes.length > 0) {
-                    console.log("click res ok");
-                    tap(expRes.find('.btn-usual-ok'));
-                    return;
-                  }
-                  var friendRequest = $('.pop-usual.pop-friend-request.pop-show');
-                  if (friendRequest.length > 0) {
-                    console.log("cancel friend request");
-                    tap(friendRequest.find(".btn-usual-cancel"));
-                    return;
-                  }
-                  var newItem = $('.pop-usual.pop-newitem.pop-show');
-                  if (newItem.length > 0) {
-                    console.log("new item!");
-                    tap(newItem.find(".btn-usual-ok"));
-                    return;
-                  }
-                  var reward = $('.pop-usual.pop-reward-item.pop-show')
-                  if (reward.length > 0) {
-                    console.log("reward");
-                    tap(reward.find('.btn-usual-ok'));
-                    return;
-                  }
-                  var abilityItem = $('.pop-usual.pop-get-abilityitem.pop-show');
-                  if (abilityItem.length > 0) {
-                    console.log("ability item");
-                    tap(abilityItem.find('.btn-usual-ok'));
-                    return;
-                  }
-                  var hellAppearance = $('.pop-usual.pop-hell-appearance')
-                  if (hellAppearance.length > 0) {
-                    window.Comm.stopQuest();
-                    location.href = "http://game.granbluefantasy.jp/#quest/supporter/510051/5";
-                    alert("hell appear!");
-                    return;
-                  }
-                  var notifiTitle = $('.pop-usual.pop-notification-title.pop-show');
-                  if (notifiTitle.length > 0) {
-                    console.log("click title");
-                    tap(notifiTitle.find('.btn-usual-ok'));
-                    return;
-                  }
-                  var cntRes = $('.cnt-result');
-                  if (cntRes.length > 0) {
-                    console.log("return quests");
-                    //window.Comm.setLocalValue('battle-end', 1, null);
-                    tap(cntRes.find('.btn-control'));
-                    return;
-                  }
+                var hellAppearance = $('.pop-usual.pop-hell-appearance')
+                if (hellAppearance.length > 0) {
+                  window.Comm.stopQuest();
+                  location.href = "http://game.granbluefantasy.jp/#quest/supporter/510051/5";
+                  alert("hell appear!");
+                  return;
+                }
+                var cntRes = $('.cnt-result');
+                if (cntRes.length > 0) {
+                  console.log("return quests");
+                  //window.Comm.setLocalValue('battle-end', 1, null);
+                  tap(cntRes.find('.btn-control'));
+                  return;
                 }
               } else {
                 console.log("in battle!");
-                battle(prefix);
+                //battle(prefix);
+                window.Battle.battle_step_forward();
                 return;
               }
             }
             return;
           }
       });
-  }, 1000);
+  }, 500);
 
 
 window.auto_cop = setInterval(function() {
@@ -309,7 +268,8 @@ window.auto_cop = setInterval(function() {
     if (in_cop == 2 && run_cop == 1) {
       if (prefix.includes('raid_multi')) {
         console.log("in battle");
-        battle(prefix);
+        //battle(prefix);
+        window.Battle.battle_step_forward();
       } else {
         console.log("enter multi raid res");
         window.Comm.setLocalValue("in-cop", 3, null);
@@ -326,28 +286,8 @@ window.auto_cop = setInterval(function() {
       }
       if (prefix.includes("result_multi")) {
         console.log("multi res");
-        var exp = $(".pop-usual.pop-exp.pop-show");
-        if (exp.length > 0) {
-            console.log("tap exp");
-            tap(exp.find(".btn-usual-ok"));
-            return;
-        }
 
-        var mission = $(".pop-usual.pop-mission-check.pop-show");
-        if (mission.length > 0) {
-          console.log("top mission");
-          tap(mission.find(".btn-usual-close"));
-          return;
-        }
-
-        var friendRequest = $('.pop-usual.pop-friend-request.pop-show');
-        if (friendRequest.length > 0) {
-          console.log("cancle friendRequest");
-          var btn = friendRequest.find(".btn-usual-cancel");
-          tap(btn);
-          return;
-        }
-
+        if (window.Comm.handle_battle_result()) return;
         if ($(".btn-control").length > 0) {
           console.log("back to room");
           tap($(".btn-control"));
@@ -359,51 +299,9 @@ window.auto_cop = setInterval(function() {
 }, 1000);
 
 
-
-
-
-function battle(prefix) {
-  window.Comm.getLocalValue(function(items){
-    if (window.Comm.attackBtnReady()) {
-      if (prefix.includes('raid_multi')) {
-        var cop_option = items['cop-option'];
-        console.log(cop_option);
-        if (cop_option == 1) {
-          var btn = window.Comm.getCharaAblilityBtn(1, 1);
-          if (btn) {
-            console.log("click ability");
-            tap(btn);
-            return true;
-          } else {
-            console.log("ability not ready");
-          }
-          attackStart();
-          return true;
-        } else {
-          var btn = window.Comm.getCharaAblilityBtn(1, 1);
-          if (btn) {
-            console.log("click ability");
-            tap(btn);
-            return true;
-          } else {
-            console.log("ability not ready");
-          }
-          return false;
-        }
-      } else {
-        console.log("click attack");
-        attackStart();
-      }
-      return true;
-    } else {
-      console.log("battle waitting");
-    }
-    return false;
-  });
-}
-
 setInterval(function() {
   var conts = location.href.split('/');
+  //console.log(conts.slice(3, conts.length).join("/"));
   window.Comm.setLocalValue("current-url", conts.slice(3, conts.length).join("/"), null)
 }, 500);
 
@@ -524,9 +422,9 @@ var on_attack_btn_click = function() {
 var prefix = window.Comm.getUrlPrefix()
 if (prefix == '#raid_multi/' || prefix == '#raid/') {
   var timer_attack_btn = setInterval(function() {
-    console.log("find attack button");
+    //console.log("find attack button");
       if (attack_btn_is_set_callback == 0 && $('.btn-attack-start').length>0) {
-        console.log("attack button find");
+        //console.log("attack button find");
         clearInterval(timer_attack_btn);
         $('.btn-attack-start').bind('tap', on_attack_btn_click);
         $('.btn-attack-start').bind('click', on_attack_btn_click);
