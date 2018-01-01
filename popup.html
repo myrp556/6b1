@@ -6,41 +6,54 @@
   <script src="bootstrap/dist/js/bootstrap.min.js"></script>
 
   <script src="js/comm.js"></script>
+  <script src="js/battle.js"></script>
   <script src="js/background_.js"></script>
   <script src="js/popup.js"></script>
 </head>
 <body style="width: 500px; height: 800px">
-  <h1>sodayo</h1>
-  <div>
-    <input type="checkbox" id="quick-attack"/>
-    <label>quick attack</label>
-    <input type="checkbox" id="stuck-refresh" />
-    <label>stuck refresh</label>
-  </div>
+  <div class="container">
 
-  <input id="fly-speed" type="button" class="btn btn-primary" value="speed" />
-  <br />
+    <h1>sodayo</h1>
+    <hr />
+    <div>
+      <input type="checkbox" id="quick-attack"/>
+      <label>quick attack</label>
+      <input type="checkbox" id="stuck-refresh" />
+      <label>stuck refresh</label>
+    </div>
+    <div>
+      <label>accelerate: </label>
+      <input id="fly-speed" type="button" class="btn btn-primary" value="speed" />
+    </div>
+    <br />
 
-  <input id="copy-quest" tupe="button" class="btn btn-primary" value="copy quest" />
-  <br />
-  <div>
-    <input id="quest-url" style="pointer-events: none;" />
-    <input type="checkbox" id="check-hell" />
-    <label>check hell</label>
-  </div>
-  <br />
+    <input id="copy-quest" tupe="button" class="btn btn-primary" value="copy quest" />
+    <br />
+    <div>
+      <input id="quest-url" style="pointer-events: none;" />
+      <input type="checkbox" id="check-hell" />
+      <label>check hell</label>
+    </div>
+    <br />
 
-  <input id="quest-button" type="button" class="btn btn-primary" value="quest" />
-  <br />
+    <input id="quest-button" type="button" class="btn btn-primary" value="quest" />
+    <br />
 
-  <input id="cop-button" type="button" class="btn btn-primary" value="cop" />
-  <div>
-    <label>single</label>
-    <input class="cop-option cop-option-0" name="cop-option" type="radio" value="0" />
-    <label>owner</label>
-    <input class="cop-option cop-option-1" name="cop-option" type="radio" value="1" />
-    <label>member</label>
-    <input class="cop-option cop-option-2" name="cop-option" type="radio" value="2" />
+    <input id="cop-button" type="button" class="btn btn-primary" value="cop" />
+    <div>
+      <label>single</label>
+      <input class="cop-option cop-option-0" name="cop-option" type="radio" value="0" />
+      <label>owner</label>
+      <input class="cop-option cop-option-1" name="cop-option" type="radio" value="1" />
+      <label>member</label>
+      <input class="cop-option cop-option-2" name="cop-option" type="radio" value="2" />
+    </div>
   </div>
   </body>
+
+  <div>
+    <label>battle: </label>
+    <select id="battle-prefrence">
+    </select>
+  </div>
 </html>

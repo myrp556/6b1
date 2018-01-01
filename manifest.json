@@ -25,6 +25,7 @@
       "js": [
         "js/jquery/dist/jquery.js",
         "js/comm.js",
+        "js/battle.js",
         "js/main.js"
 	    ],
       "run_at": "document_end",

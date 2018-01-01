@@ -59,7 +59,7 @@ window.auto_quest = setInterval(function() {
                 window.Comm.setLocalValue("in-quest", 2, null);
                 window.Comm.setLocalValue("run-quest", 1, null);
                 window.Comm.setLocalValue('battle-end', 0, null);
-                location.href = "http://game.granbluefantasy.jp/#" + quest;
+                location.href = "http://game.granbluefantasy.jp/" + quest;
                 return;
             }
             if (in_quest == 2 && run_quest == 1) {
@@ -73,6 +73,7 @@ window.auto_quest = setInterval(function() {
                 console.log($(".pop-deck.supporter").css("display"));
                 if (!$(".pop-deck.supporter").css("display") || $(".pop-deck.supporter").html().length < 10 || $(".pop-deck.supporter").css("display") == 'none') {
                   console.log("select summon");
+                  /*
                   var summon;
                   var i;
                   for (i in summons) {
@@ -82,13 +83,15 @@ window.auto_quest = setInterval(function() {
                     var res = window.Comm.getSummonInfo($(summon));
                     var name = res[0];
                     var lv = res[1];
-                    if (name == "バハムート" || name == "カグヤ" || name == "ホワイトラビット") {
+                    if (name == "ホワイトラビット" || name == "バハムート" || name == "カグヤ") {
                       console.log("tap summon");
                       tap($(summon));
                       //window.Comm.waitUntil($(".pop-deck.supporter"), 2000);
                       return;
                     };
                   }
+                  */
+                  tap($(window.Comm.selectSummon(summons, [])));
                   return;
                 }
                 var cou = 0;
@@ -194,6 +197,12 @@ window.auto_quest = setInterval(function() {
                     tap(reward.find('.btn-usual-ok'));
                     return;
                   }
+                  var abilityItem = $('.pop-usual.pop-get-abilityitem.pop-show');
+                  if (abilityItem.length > 0) {
+                    console.log("ability item");
+                    tap(abilityItem.find('.btn-usual-ok'));
+                    return;
+                  }
                   var hellAppearance = $('.pop-usual.pop-hell-appearance')
                   if (hellAppearance.length > 0) {
                     window.Comm.stopQuest();
@@ -234,7 +243,8 @@ window.auto_cop = setInterval(function() {
     var prefix = window.Comm.getUrlPrefix();
     // 0 single, 1 owner, 2 member
     var cop_option = items['cop-option'];
-
+    var cop_cou = items['cop-cou'];
+    if (!cop_cou) cop_cou = 0;
     if (in_cop > 0) {
       console.log(cop_option + " in-cop: "+in_cop+" run-cop: "+run_cop);
     }
@@ -256,6 +266,13 @@ window.auto_cop = setInterval(function() {
             tap(btn_start);
             return;
           }else {
+              cop_cou += 1;
+              if (cop_cou >= 8) {
+                window.Comm.setLocalValue('cop-cou', 0);
+                location.reload();
+              } else {
+                window.Comm.setLocalValue('cop-cou', cop_cou);
+              }
               console.log("owner waitting");
           }
         } else {
@@ -292,9 +309,7 @@ window.auto_cop = setInterval(function() {
     if (in_cop == 2 && run_cop == 1) {
       if (prefix.includes('raid_multi')) {
         console.log("in battle");
-        if (cop_option == 0 || cop_option == 2) {
-          battle(prefix);
-        }
+        battle(prefix);
       } else {
         console.log("enter multi raid res");
         window.Comm.setLocalValue("in-cop", 3, null);
@@ -352,6 +367,7 @@ function battle(prefix) {
     if (window.Comm.attackBtnReady()) {
       if (prefix.includes('raid_multi')) {
         var cop_option = items['cop-option'];
+        console.log(cop_option);
         if (cop_option == 1) {
           attackStart();
           return true;
@@ -453,23 +469,60 @@ $(document).keypress(function(e) {
     window.Comm.getLocalValue(function(items) {
       var last_key = items['last-key'];
       var key = e.which;
-
+      console.log(key);
       window.Comm.setLocalValue('last-key', key, null);
       if (key == 116) {
         attackStart();
       }
-      if (key == 115 && last_key == 115) {
+      if (key == 122) {
+        tap($('.btn-auto'));
+      }
+      if (key == 112 && last_key == 112) {
+        // p
+          location.href = "http://game.granbluefantasy.jp/#mypage";
+      }
+      if (key == 117 && last_key == 117) {
+        // u
+          location.href = "http://game.granbluefantasy.jp/#quest/extra";
+      }
+      if (key == 105 && last_key == 105) {
+        // i
+        if (location.href != "http://game.granbluefantasy.jp/#coopraid/offer/null/0/1") {
+          location.href = "http://game.granbluefantasy.jp/#coopraid/offer/null/0/1";
+        } else {
+          tap($('.btn-refresh-list'));
+        }
+      }
+      if (key == 121 && last_key == 121) {
+        // y
         location.reload();
       }
     });
 });
-
-$('.btn-attack-start').bind('tap', function() {
-  console.log('btn-attck');
-  window.Comm.getLocalValue(function(items) {
-    var stuck_refresh = items['stuck-refresh'];
-    if (stuck_refresh && this.hasClass('display-on')) {
-      location.reload();
-    }
-  });
-});
+var attack_btn_is_set_callback = 0;
+var on_attack_btn_click = function() {
+    console.log('attack click');
+    //attack_btn_is_set_callback = 0;
+    window.Comm.getLocalValue(function(items) {
+      var stuck_refresh = items['stuck-refresh'];
+      if (stuck_refresh && $('.btn-attack-start').hasClass('display-on')) {
+        location.reload();
+      } else {
+        //$('.btn-attack-start').one('click', on_attack_btn_click);
+        //attack_btn_is_set_callback = 1;
+      }
+    });
+}
+var prefix = window.Comm.getUrlPrefix()
+if (prefix == '#raid_multi/' || prefix == '#raid/') {
+  var timer_attack_btn = setInterval(function() {
+    console.log("find attack button");
+      if (attack_btn_is_set_callback == 0 && $('.btn-attack-start').length>0) {
+        console.log("attack button find");
+        clearInterval(timer_attack_btn);
+        $('.btn-attack-start').bind('tap', on_attack_btn_click);
+        $('.btn-attack-start').bind('click', on_attack_btn_click);
+        attack_btn_is_set_callback = 1;
+      }
+  }, 200);
+}

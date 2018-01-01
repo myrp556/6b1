@@ -108,6 +108,14 @@ var PopUp = {
           console.log(this.checked);
             window.Comm.setLocalValue("check-hell", this.checked, null);
         });
+
+        t.refreshBattlePrefence();
+        $('#battle-prefrence').change(function() {
+          console.log("prefrence changed");
+          var prefrence = this.value;
+          console.log(prefrence);
+          window.Comm.setLocalValue('battle-prefrence', prefrence, null);
+        })
     },
 
 
@@ -141,7 +149,33 @@ var PopUp = {
     refreshCopOption: function(v) {
         console.log("set cop-option: "+v);
         window.Comm.setLocalValue('cop-option', parseInt(v), null);
+    },
+    refreshBattlePrefence: function() {
+        window.Comm.getLocalValue(function(items) {
+            var prefrence = items['battle-prefrence'];
+            var prefrences = window.Battle.prefrences;
+            var html = "";
+            var i;
+            console.log("get prefrence " + prefrence);
+            for (i in prefrences) {
+              console.log(i);
+              var selected = '';
+              if (prefrence == i) {
+                  html += "<option selected='selected' value='" + i + "'>" + i + "</option>";
+              } else {
+                  html += "<option value='" + i + "'>" + i + "</option>";
+              }
+            }
+            $('#battle-prefrence').html(html);
+            if (!prefrence) {
+              //console.log($($('#battle-prefrence').find('option')[0]));
+              prefrence = $($('#battle-prefrence').find('option')[0]).html();
+              $($('#battle-prefrence').find('option')[0]).attr('selected', 'selected');
+              window.Comm.setLocalValue('battle-prefrence', prefrence);
+            }
+        });
     }
+
 }
 
 var setValue = function(tkey, value) {
