@@ -369,6 +369,14 @@ function battle(prefix) {
         var cop_option = items['cop-option'];
         console.log(cop_option);
         if (cop_option == 1) {
+          var btn = window.Comm.getCharaAblilityBtn(1, 1);
+          if (btn) {
+            console.log("click ability");
+            tap(btn);
+            return true;
+          } else {
+            console.log("ability not ready");
+          }
           attackStart();
           return true;
         } else {
