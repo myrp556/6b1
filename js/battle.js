@@ -133,7 +133,7 @@ window.Battle = {
       })();
       window.Comm.setLocalValue('in-step-forward', 0, null);
       window.Comm.setLocalValue('action-list', action_list, null);
-      if (prefrences && prefrence && prefrences[prefrences]) {
+      if (prefrences && prefrence && prefrences[prefrence]) {
         var plan = prefrences[prefrence];
         if (plan['refresh']) {
           location.reload();

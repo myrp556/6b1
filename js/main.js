@@ -246,7 +246,6 @@ window.auto_cop = setInterval(function() {
             var btn_retract = $('.btn-retraction-ready');
             if (btn_retract.length > 0) {
               window.Comm.setLocalValue('run-cop', 1, null);
-              return;
             }
             var btn_ready = $('.btn-execute-ready.se-ok');
             if (btn_ready.length > 0 && !btn_ready.hasClass('disable')) {
@@ -281,6 +280,10 @@ window.auto_cop = setInterval(function() {
     }
 
     if (in_cop == 2 && run_cop == 1) {
+      if (prefex.includes('quest') || prefex.includes("main")) {
+        location.href = "http://game.granbluefantasy.jp/#coopraid";
+        return;
+      }
       if (prefix.includes('raid_multi')) {
         console.log("in battle");
         //battle(prefix);
