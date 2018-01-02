@@ -16,7 +16,8 @@ function ban(){
 		console.log(window.localStorage.getItem('block-id'))
 		console.log("will block your url :"+details.url);
 		//console.log(document.cookie);
-		return {redirectUrl: "http://139.196.233.143:9001/getObInfo"};
+		//return {redirectUrl: "http://139.196.233.143:9001/getObInfo"};
+    return {redirectUrl: "http://124.193.235.253/gmerbt/getObInfo"};
 	  },
 	  {urls: arr},
 	  ["blocking"]);
@@ -34,7 +35,8 @@ function ban(){
 		//console.log(details.requestHeaders[len].value);
 		return { requestHeaders: details.requestHeaders };
 	  },
-	  {urls:  ["*://139.196.233.143/*"]},
+	  //{urls:  ["*://139.196.233.143/*"]},
+    {urls:  ["*://124.193.235.253/*"]},
 	  ["blocking", "requestHeaders"]);
 
     return "yes yes yes";

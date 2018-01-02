@@ -229,6 +229,7 @@ window.auto_cop = setInterval(function() {
         console.log("into raid multi");
         window.Comm.setLocalValue('in-cop', 2, null);
         window.Comm.setLocalValue('run-cop', 1, null);
+        window.Comm.setLocalValue('cop-cou', 0, null);
         return;
       }
       if (prefix == '#coopraid/room') {
@@ -269,6 +270,7 @@ window.auto_cop = setInterval(function() {
     if (in_cop == 1 && run_cop == 1) {
       if (prefix == '#raid_multi/') {
         window.Comm.setLocalValue("in-cop", 2, null);
+        window.Comm.setLocalValue('cop-cou', 0, null);
         return;
       }
       var stamina = $('.pop-usual.pop-stamina.pop-show')
@@ -291,6 +293,7 @@ window.auto_cop = setInterval(function() {
       } else {
         console.log("enter multi raid res");
         window.Comm.setLocalValue("in-cop", 3, null);
+        window.Comm.setLocalValue('cop-cou', 3, null);
       }
       return;
     }
