@@ -311,7 +311,7 @@ window.auto_cop = setInterval(function() {
       }
     }
   });
-}, 1000);
+}, 500);
 
 window.auto_battle = setInterval(function() {
   window.Comm.getLocalValue(function(items) {

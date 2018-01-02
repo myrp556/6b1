@@ -3,7 +3,7 @@
 window.Battle = {
   'prefrences': {
     'attack': {},
-    '1.1': {'normal': ['1.1']},
+    'スラ爆': {'normal': ['1.1'], 'refresh': true},
     '光': {
       'normal': ['1.1', '1.3', '2.1', '2.2', '2.3', '3.1', '4.2', '4.1', '4.3'],
       'linear': [
@@ -81,7 +81,7 @@ window.Battle = {
       window.Comm.setLocalValue('in-step-forward', 1, null);
       var prefrence = items['battle-prefrence'];
       var prefrences = window.Battle.prefrences;
-      var action_list = items['action-list'];
+      var action_list = items['action-likst'];
       if (!action_list || typeof(action_list) == 'undefined') {
         action_list = [];
       }
@@ -133,6 +133,12 @@ window.Battle = {
       })();
       window.Comm.setLocalValue('in-step-forward', 0, null);
       window.Comm.setLocalValue('action-list', action_list, null);
+      if (prefrences && prefrence && prefrences[prefrences]) {
+        var plan = prefrences[prefrence];
+        if (plan['refresh']) {
+          location.reload();
+        }
+      }
     });
   }
 }
