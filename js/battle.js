@@ -112,9 +112,9 @@ window.Battle = {
           }
         }
         if (window.Comm.attackBtnReady()) {
+          var tapped = false;
           (function() {
             if (window.Comm.abilityRailIsClear()) {
-              var tapped = false;
               if (action_list && action_list.length > 0) {
                 for (i in action_list) {
                   var btn = window.Comm.getCharaAblilityBtn_dot(action_list[i]);
