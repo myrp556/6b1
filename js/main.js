@@ -280,7 +280,7 @@ window.auto_cop = setInterval(function() {
     }
 
     if (in_cop == 2 && run_cop == 1) {
-      if (prefex.includes('quest') || prefex.includes("main")) {
+      if (prefix.includes('quest') || prefix.includes("main")) {
         location.href = "http://game.granbluefantasy.jp/#coopraid";
         return;
       }
