@@ -259,7 +259,7 @@ window.auto_cop = setInterval(function() {
             }
         }
         cop_cou += 1;
-        if (cop_cou >= 8) {
+        if (cop_cou >= window.Settings.copraid_room_wait_second * 2) {
           window.Comm.setLocalValue('cop-cou', 0);
           location.reload();
         } else {
@@ -303,6 +303,7 @@ window.auto_cop = setInterval(function() {
         console.log("back to start");
         window.Comm.setLocalValue("in-cop", 1, null);
         window.Comm.setLocalValue('run-cop', 0, null);
+        window.Comm.setLocalValue('cop-cou', 0, null);
         return;
       }
       if (prefix.includes("result_multi")) {
@@ -313,6 +314,16 @@ window.auto_cop = setInterval(function() {
           console.log("back to room");
           tap($(".btn-control"));
           return;
+        }
+
+        cop_cou += 1;
+        if (cop_cou >= window.Settings.copraid_result_wait_second * 2) {
+          window.Comm.setLocalValue("cop-cou", 0, null);
+          //console.log("cop battle refresh");
+          location.reload();
+          return;
+        } else {
+          window.Comm.setLocalValue('cop-cou', cop_cou, null);
         }
       }
     }
@@ -447,7 +458,7 @@ var on_attack_btn_click = function() {
     window.Comm.getLocalValue(function(items) {
       var stuck_refresh = items['stuck-refresh'];
       if (stuck_refresh && $('.btn-attack-start').hasClass('display-on')) {
-        location.reload();
+        //location.reload();
       } else {
         //$('.btn-attack-start').one('click', on_attack_btn_click);
         //attack_btn_is_set_callback = 1;

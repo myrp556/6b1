@@ -24,6 +24,7 @@
       ],
       "js": [
         "js/jquery/dist/jquery.js",
+        "js/settings.js",
         "js/comm.js",
         "js/quest.js",
         "js/battle.js",

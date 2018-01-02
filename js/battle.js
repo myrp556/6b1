@@ -3,7 +3,7 @@
 window.Battle = {
   'prefrences': {
     'attack': {},
-    'スラ爆': {'normal': ['1.1'], 'refresh': true},
+    'スラ爆': {'normal': ['1.1'], 'refresh-ability': true, 'refresh-attack': true},
     '光': {
       'normal': ['1.1', '1.3', '2.1', '2.2', '2.3', '3.1', '4.2', '4.1', '4.3'],
       'linear': [
@@ -49,9 +49,8 @@ window.Battle = {
 
   'battle_step_forward': function() {
     //console.log('battle step forward');
-    var btn_res = $('.btn-result.on');
-    if (btn_res.length > 0) {
-      console.log("battle res");
+    var btn_res = $('.btn-result');
+    if (btn_res.length > 0 && btn_res.parent().length > 0 && btn_res.parent().css('display') != 'none') {
       window.Comm.tap(btn_res);
       return;
     }
@@ -60,6 +59,8 @@ window.Battle = {
     console.log("turn " + turn_num);
     if (turn_num == 1) {
       window.Comm.setLocalValue('action-list', [], null);
+      //window.Comm.setLocalValue('attack-tapped', false, null);
+      //window.Comm.setLocalValue('abili-tapped', false, null);
     }
 
     var rematch = $('.pop-usual.pop-rematch-fail.pop-show');
@@ -81,27 +82,30 @@ window.Battle = {
       window.Comm.setLocalValue('in-step-forward', 1, null);
       var prefrence = items['battle-prefrence'];
       var prefrences = window.Battle.prefrences;
-      var action_list = items['action-likst'];
+      var action_list = items['action-list'];
       if (!action_list || typeof(action_list) == 'undefined') {
         action_list = [];
       }
+      var planC = null;
+      var abili_tapped = items['abili-tapped'], attack_tapped = items['attack-tapped'];
+      var tap_abili = false, tap_attack = false;
 
+      if (prefrences && prefrence && prefrences[prefrence]) planC = prefrences[prefrence];
       //console.log("prefrence " + prefrence);
       //console.log("action-list" + action_list);
 
       (function() {
         var i, j, k;
-        if ((!action_list || action_list.length == 0 ) && prefrence && prefrence in prefrences) {
-          var plan = prefrences[prefrence];
-          for (i in plan['normal']) {
-            var btn = window.Comm.getCharaAblilityBtn_dot(plan['normal'][i]);
+        if ((!action_list || action_list.length == 0 ) && planC) {
+          for (i in planC['normal']) {
+            var btn = window.Comm.getCharaAblilityBtn_dot(planC['normal'][i]);
             if (btn != null && btn) {
-              console.log("add normal " + plan['normal'][i]);
-              action_list.push(plan['normal'][i]);
+              console.log("add normal " + planC['normal'][i]);
+              action_list.push(planC['normal'][i]);
             }
           }
-          for (i in plan['linear']) {
-            var linear = plan['linear'][i];
+          for (i in planC['linear']) {
+            var linear = planC['linear'][i];
             if (window.Comm.abilityListReady_dot(linear)) {
               for (j in linear) {
                 console.log("add linear " + linear[j]);
@@ -112,27 +116,25 @@ window.Battle = {
           }
         }
         if (window.Comm.attackBtnReady()) {
-          var tapped = false;
+          window.Comm.setLocalValue('attack-tapped', false, null);
           (function() {
             if (window.Comm.abilityRailIsClear()) {
+              window.Comm.setLocalValue('abili-tapped', false, null);
               if (action_list && action_list.length > 0) {
                 for (i in action_list) {
                   var btn = window.Comm.getCharaAblilityBtn_dot(action_list[i]);
                   action_list.splice(i, 1);
                   if (btn) {
-                    tapped = window.Comm.tap(btn);
+                    tap_abili = window.Comm.tap(btn);
                     return;
                   }
                 }
               }
-              tapped = window.Battle.tap_attack_start();
+              tap_attack = window.Battle.tap_attack_start();
             } else {
               //console.log("in skill");
             }
           }) ();
-          if (plan['refresh'] && tapped) {
-            location.reload();
-          }
         } else {
           //console.log("attack btn not ready");
         }
@@ -140,13 +142,22 @@ window.Battle = {
 
       window.Comm.setLocalValue('in-step-forward', 0, null);
       window.Comm.setLocalValue('action-list', action_list, null);
-      /*
-      if (prefrences && prefrence && prefrences[prefrence]) {
-        var plan = prefrences[prefrence];
-        if (plan['refresh']) {
-          location.reload();
-        }
-      }*/
+
+      if (!tap_attack && planC['refresh-attack'] && attack_tapped) {
+        console.log("attack refresh");
+        location.reload();
+        //return;
+      }
+      //console.log("abli-tap: " + tap_abili + " refresh abili: " + planC['refresh-ability'] + " abili-tapped: " + abili_tapped);
+      if (!tap_abili && planC['refresh-ability'] && abili_tapped) {
+        console.log("abili refresh");
+        location.reload();
+        //return;
+      }
+
+      window.Comm.setLocalValue('attack-tapped', tap_attack, null);
+      window.Comm.setLocalValue('abili-tapped', tap_abili, null);
+
     });
   }
 }
