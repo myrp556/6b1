@@ -258,7 +258,7 @@ window.auto_cop = setInterval(function() {
             }
         }
         cop_cou += 1;
-        if (cop_cou >= 8) {
+        if (cop_cou >= 15) {
           window.Comm.setLocalValue('cop-cou', 0);
           location.reload();
         } else {
