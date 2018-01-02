@@ -43,6 +43,7 @@ window.auto_quest = setInterval(function() {
         var battle_end = items["battle-end"];
         var prefix = window.Comm.getUrlPrefix();
         var check_hell = items['check-hell'];
+        var quest_list = items['quest-list'];
 
         if (in_quest > 0) {
           console.log("in-quest: "+in_quest+" run_quest: "+run_quest);
@@ -63,6 +64,14 @@ window.auto_quest = setInterval(function() {
                 return;
             }
             if (in_quest == 2 && run_quest == 1) {
+                if ($('.pop-usual.common-pop-error.pop-show').length > 0) {
+                  if (quest_list && quest_list.length > 0) {
+                    if (window.Quest.enter_next_quest()) {
+                      return;
+                    }
+                  }
+                }
+
                 if ($('.cnt-quest').length == 0 || $(".ctn-qust").css("display")=='none') {
                   return;
                 }
@@ -135,6 +144,12 @@ window.auto_quest = setInterval(function() {
               window.Comm.setLocalValue("run-quest", 3, null);
               console.log("wait for battle start...");
 
+              if ($('.pop-usual.common-pop-error.pop-show').length > 0) {
+                if (quest_list && quest_list.length > 0) {
+                  if (window.Quest.enter_next_quest()) return;
+                }
+              }
+
               var pop_show = $(".pop-usual.pop-skip-result.pop-show");
               if (pop_show.length > 0) {
                 console.log("skip result");
@@ -157,7 +172,7 @@ window.auto_quest = setInterval(function() {
                 window.Comm.startQuest(quest);
                 return;
               }
-              if (window.Comm.getUrlPrefix() == '#result/') {
+              if (window.Comm.getUrlPrefix().includes('result')) {
                 console.log("battle res");
                 if (!check_hell) {
                   window.Comm.setLocalValue('battle-end', 1, null);
@@ -225,14 +240,7 @@ window.auto_cop = setInterval(function() {
             tap(btn_start);
             return;
           }else {
-              cop_cou += 1;
-              if (cop_cou >= 8) {
-                window.Comm.setLocalValue('cop-cou', 0);
-                location.reload();
-              } else {
-                window.Comm.setLocalValue('cop-cou', cop_cou);
-              }
-              console.log("owner waitting");
+            console.log("owner waitting");
           }
         } else {
             var btn_retract = $('.btn-retraction-ready');
@@ -249,6 +257,13 @@ window.auto_cop = setInterval(function() {
             } else {
                console.log("member waitting");
             }
+        }
+        cop_cou += 1;
+        if (cop_cou >= 8) {
+          window.Comm.setLocalValue('cop-cou', 0);
+          location.reload();
+        } else {
+          window.Comm.setLocalValue('cop-cou', cop_cou);
         }
       }
     }
@@ -297,6 +312,20 @@ window.auto_cop = setInterval(function() {
     }
   });
 }, 1000);
+
+window.auto_battle = setInterval(function() {
+  window.Comm.getLocalValue(function(items) {
+      var auto_battle = items['auto-battle'];
+      var prefix = window.Comm.getUrlPrefix();
+      if (auto_battle > 0) {
+        if (prefix.includes('raid_multi') || prefix.includes('raid')) {
+          window.Battle.battle_step_forward();
+        } else {
+          window.Comm.setLocalValue('auto-battle', 0);
+        }
+      }
+  });
+}, 500);
 
 
 setInterval(function() {

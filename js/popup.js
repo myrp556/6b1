@@ -116,6 +116,47 @@ var PopUp = {
           console.log(prefrence);
           window.Comm.setLocalValue('battle-prefrence', prefrence, null);
         })
+
+        $('#auto-battle').click(function() {
+            window.Comm.setLocalValue('auto-battle', 1);
+            t.refreshAutoBattle();
+        });
+        t.refreshAutoBattle();
+
+        $('#quest-list-button').click(function() {
+          window.Comm.getLocalValue(function(items) {
+            var quest_list = items['quest-list'];
+
+            if (quest_list && quest_list.length>0) {
+              console.log("stop quest list");
+              window.Comm.setLocalValue('quest-list', [], null);
+              window.Comm.stopQuest();
+            } else {
+              var i;
+              var hard_quests_chks = $('.hard-quest-checkbox');
+              var quest_list = [];
+              for (i = 0; i < hard_quests_chks.length; i++) {
+                var chk = $(hard_quests_chks[i]);
+                if (chk.prop('checked')) {
+                  console.log('add ' + chk.attr('url') + ' to quest list');
+                  quest_list.push(chk.attr('url'));
+                }
+              }
+              console.log(quest_list);
+              window.Comm.setLocalValue('quest-list', quest_list, null);
+
+              console.log("start quest list");
+              if (quest_list.length > 0) {
+                window.Comm.setLocalValue('quest', quest_list[0], null);
+                window.Comm.startQuest();
+              }
+
+            }
+            t.refreshQuestListButton();
+          });
+        });
+        t.refreshQuestListButton();
+        t.refreshQuestList();
     },
 
 
@@ -174,7 +215,49 @@ var PopUp = {
               window.Comm.setLocalValue('battle-prefrence', prefrence);
             }
         });
+    },
+    refreshAutoBattle: function() {
+      window.Comm.getLocalValue(function(items) {
+          var auto_battle = items['auto-battle'];
+          if (auto_battle > 0) {
+            $('#auto-battle').val("stop auto");
+          } else {
+            $('#auto-battle').val("start auto");
+          }
+      })
+    },
+    refreshQuestListButton: function() {
+      window.Comm.getLocalValue(function(items) {
+        var quest_list = items['quest-list'];
+        if (quest_list && quest_list.length > 0) {
+          $('#quest-list-button').val('stop quest list');
+        } else {
+          $('#quest-list-button').val('start quest list');
+        }
+      });
+    },
+    refreshQuestList: function() {
+      window.Comm.getLocalValue(function(items) {
+        var quest_list = items['quest-list'];
+        var hard_quests_html = ''
+        var i, j;
+        for (i in window.Quest.hard_quests) {
+          var quest = window.Quest.hard_quests[i];
+          hard_quests_html += "<input type='checkbox' class='hard-quest-checkbox' id='"+i+"' url='"+quest.url+"'/>"
+          hard_quests_html += "<label>"+quest.name+"</label>"
+        }
+        $('#hard-quests').html(hard_quests_html);
+        for (i = 0; i < $('.hard-quest-checkbox').length; i++) {
+          var blk = $($('.hard-quest-checkbox')[i]);
+          var url = window.Quest.hard_quests[i].url;
+          if (quest_list && quest_list.includes(url)) {
+            console.log("has hard " + i);
+            blk.prop('checked', 'true');
+          }
+        }
+      });
     }
+
 
 }
 

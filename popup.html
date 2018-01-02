@@ -7,10 +7,11 @@
 
   <script src="js/comm.js"></script>
   <script src="js/battle.js"></script>
+  <script src="js/quest.js"></script>
   <script src="js/background_.js"></script>
   <script src="js/popup.js"></script>
 </head>
-<body style="width: 500px; height: 800px">
+<body style="width: 350px; height: 800px">
   <div class="container">
 
     <h1>sodayo</h1>
@@ -26,8 +27,11 @@
       <input id="fly-speed" type="button" class="btn btn-primary" value="speed" />
     </div>
     <br />
+    <div>
+      <input id='auto-battle' type="button" class="btn btn-primary" value='auto'/>
+    </div>
 
-    <input id="copy-quest" tupe="button" class="btn btn-primary" value="copy quest" />
+    <input id="copy-quest" type="button" class="btn btn-primary" value="copy quest" />
     <br />
     <div>
       <input id="quest-url" style="pointer-events: none;" />
@@ -55,5 +59,12 @@
     <label>battle: </label>
     <select id="battle-prefrence">
     </select>
+  </div>
+
+  <div>
+      <div id="hard-quests">
+
+      </div>
+      <input id="quest-list-button" type="button" class="btn btn-primary" value="qlist" />
   </div>
 </html>

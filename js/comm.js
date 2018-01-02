@@ -191,7 +191,7 @@ window.Comm = {
     var notifiTitle = $('.pop-usual.pop-notification-title.pop-show');
     if (notifiTitle.length > 0) {
       console.log("click title");
-      tap(notifiTitle.find('.btn-usual-ok'));
+      tap(notifiTitle.find('.btn-usual-close'));
       return true;
     }
 
