@@ -138,15 +138,21 @@ window.auto_quest = setInterval(function() {
             }
 
             if (in_quest == 3 && run_quest <= 3) {
-              var url = location.href
+              var url = location.href;
 
               console.log("in quest 3");
               window.Comm.setLocalValue("run-quest", 3, null);
               console.log("wait for battle start...");
 
-              if ($('.pop-usual.common-pop-error.pop-show').length > 0) {
+              if ($('.pop-usual.common-pop-error.pop-show').length > 0 || $('.prt-error-infomation').length > 0) {
                 if (quest_list && quest_list.length > 0) {
                   if (window.Quest.enter_next_quest()) return;
+                } else {
+                  if ($('.pop-usual.common-pop-error.pop-show').length > 0) {
+                    window.Comm.tap($('.pop-usual.common-pop-error.pop-show').find('.btn-usual-ok'));
+                  }
+                  window.Comm.stopQuest();
+                  //window.Comm.startQuest();
                 }
               }
 
@@ -233,37 +239,45 @@ window.auto_cop = setInterval(function() {
         return;
       }
       if (prefix == '#coopraid/room') {
+        var btn_start = $('.btn-quest-start.multi');
+        var btn_retract = $('.btn-retraction-ready');
         if (cop_option < 2) {
-          var btn_start = $('.btn-quest-start.multi');
           if (btn_start.length > 0 && !btn_start.hasClass('disable')) {
             console.log('tap cop start');
             window.Comm.setLocalValue('run-cop', 1, null);
+            window.Comm.setLocalValue('cop-cou', 0, null);
             tap(btn_start);
             return;
           }else {
             console.log("owner waitting");
           }
         } else {
-            var btn_retract = $('.btn-retraction-ready');
             if (btn_retract.length > 0) {
               window.Comm.setLocalValue('run-cop', 1, null);
+              window.Comm.setLocalValue('cop-cou', 0, null);
+              return;
             }
             var btn_ready = $('.btn-execute-ready.se-ok');
             if (btn_ready.length > 0 && !btn_ready.hasClass('disable')) {
               console.log('tap cop ready');
               window.Comm.setLocalValue('run-cop', 1, null);
+              window.Comm.setLocalValue('cop-cou', 0, null);
               tap(btn_ready);
               return;
             } else {
                console.log("member waitting");
             }
         }
-        cop_cou += 1;
-        if (cop_cou >= window.Settings.copraid_room_wait_second * 2) {
-          window.Comm.setLocalValue('cop-cou', 0);
-          location.reload();
-        } else {
+
+        if ((btn_start.length > 0 && btn_start.hasClass('disable')) || (btn_ready.length > 0 && btn_ready.hasClass('disable'))) {
+          cop_cou += 1;
+          if (cop_cou >= window.Settings.copraid_room_wait_second * 2) {
+            window.Comm.setLocalValue('cop-cou', 0);
+            location.reload();
+            return;
+          }
           window.Comm.setLocalValue('cop-cou', cop_cou);
+          return;
         }
       }
     }
@@ -277,6 +291,21 @@ window.auto_cop = setInterval(function() {
       if (stamina.length > 0) {
         alert("no ap enough!");
         window.Comm.stopCop();
+        return;
+      }
+      if (prefix.includes('coopraid') && $('.pop-usual.pop-notice.pop-show').length > 0) {
+        alert("raid expired");
+        window.Comm.stopCop();
+        return;
+      }
+
+      cop_cou += 1;
+      if (cop_cou >= window.Settings.copraid_room_wait_second * 2) {
+        window.Comm.setLocalValue('cop-cou', 0);
+        location.reload();
+        return;
+      } else {
+        window.Comm.setLocalValue('cop-cou', cop_cou);
         return;
       }
     }

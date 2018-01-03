@@ -118,8 +118,15 @@ var PopUp = {
         })
 
         $('#auto-battle').click(function() {
-            window.Comm.setLocalValue('auto-battle', 1);
+          window.Comm.getLocalValue(function(items) {
+            if (items['auto-battle'] > 0) {
+              window.Comm.setLocalValue('action-list', [], null)
+              window.Comm.setLocalValue('auto-battle', 0, null);
+            } else {
+              window.Comm.setLocalValue('auto-battle', 1, null);
+            }
             t.refreshAutoBattle();
+          });
         });
         t.refreshAutoBattle();
 

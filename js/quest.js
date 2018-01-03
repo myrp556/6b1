@@ -25,18 +25,21 @@ window.Quest = {
     {'name': '光-magena',
       'url': '#quest/supporter/300271/1/0/26'},
     {'name': '水-magena',
-      'url': ''},
+      'url': '#quest/supporter/300161/1/0/20'},
     {'name': '暗-magena',
       'url': '#quest/supporter/300281/1/0/31'}
   ],
 
   'enter_next_quest': function() {
+    window.Comm.stopQuest();
     window.Comm.getLocalValue(function(items) {
       var quest_list = items['quest-list'];
+      //console.log("quest before " + quest_list);
       quest_list.splice(0, 1);
-      window.Comm.setLocalValue('quest-list', quest_list);
+      //console.log("quest after " + quest_list);
+      window.Comm.setLocalValue('quest-list', quest_list, null);
       if (quest_list.length > 0) {
-        window.setLocalValue('quest', quest_list[0], null);
+        window.Comm.setLocalValue('quest', quest_list[0], null);
         window.Comm.startQuest();
         return true;
       } else {

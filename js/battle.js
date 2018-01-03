@@ -10,8 +10,14 @@ window.Battle = {
         ['1.2', '1.4']
       ]
     },
+    '光简': {
+      'normal': ['1.1', '1.3', '2.2', '2.3', '3.1', '4.2'],
+      'linear': [
+        ['1.2', '1.4']
+      ]
+    },
     'トレハン': {
-      'normal': ['1.2', '1.3', '4.2', '1.4', '3.1', '3.3', '2.1', '2.2', '2.3', '4.1', '4.3']
+      'normal': ['1.2', '1.3', '4.2', '1.4', '3.1', '4.3']
     },
     '暗帽子': {
       'normal': ['1.2', '1.3', '2.2', '2.1', '4.2', '4.1', '3.2', '3.1', '3.3', '1.1', '1.4']
@@ -58,7 +64,7 @@ window.Battle = {
     var turn_num = this.get_turn_number();
     console.log("turn " + turn_num);
     if (turn_num == 1) {
-      window.Comm.setLocalValue('action-list', [], null);
+      //window.Comm.setLocalValue('action-list', [], null);
       //window.Comm.setLocalValue('attack-tapped', false, null);
       //window.Comm.setLocalValue('abili-tapped', false, null);
     }
@@ -83,9 +89,12 @@ window.Battle = {
       var prefrence = items['battle-prefrence'];
       var prefrences = window.Battle.prefrences;
       var action_list = items['action-list'];
-      if (!action_list || typeof(action_list) == 'undefined') {
+      var last_battle = items['last-battle'];
+      var string = window.Comm.getUrlString();
+      if (!action_list || typeof(action_list) == 'undefined' || string != last_battle) {
         action_list = [];
       }
+      window.Comm.setLocalValue('last-battle', string, null);
       var planC = null;
       var abili_tapped = items['abili-tapped'], attack_tapped = items['attack-tapped'];
       var tap_abili = false, tap_attack = false;

@@ -38,6 +38,12 @@ window.Comm = {
     return prefix+'/'+sub;
   },
 
+  'getUrlString': function() {
+    var url = location.href;
+    var conts = url.split('/');
+    return conts.splice(3, conts.length - 3).join('/');
+  },
+
   'startQuest': function(quest) {
     console.log("start quest " + quest);
     this.setLocalValue('in-quest', 1, null);
